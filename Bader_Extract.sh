@@ -29,17 +29,18 @@ fi
 printf "%5s %5s %6s\n"  "#  Num" "  Atom" "  Bader"  > BaderCharge_Analysis.dat
 echo "-------------------------" >> BaderCharge_Analysis.dat
 
-grep -v '#\|\-\|VACUUM\|VACUUM\|NUMBER' ACF.dat | awk '{print $5}' > TMP1
+
+grep -v '#\|\--\|VACUUM\|VACUUM\|NUMBER' ACF.dat | awk '{print $5}' > TMP1
 
 
 ncol=$(grep -B 2 -i 'direct' POSCAR  | head -n 1  | awk '{print NF}')
-
+atoms=$(grep TITEL POTCAR | awk '{print $4}')
 count=0
 for i in $(seq 1 1 $ncol);
 do
-    atm=$(grep -B 2 -i 'direct' POSCAR  | head -n 1  | awk -v var=$i '{print $var}')
+    atm=$(echo "$atoms" | awk -v line="$i" 'NR == line {print}')
     num=$(grep -B 2 -i 'direct' POSCAR  | tail -n 2  | head -n 1  | awk -v var=$i '{print $var}')
-    chg=$(grep -A 1 "PAW_PBE $atm" POTCAR | grep -v 'TITEL\|LULTRA' | tail -n 2 | head -n 1)
+    chg=$(grep -A 1 "PAW_PBE $atm " POTCAR | grep -v 'TITEL\|LULTRA' | tail -n 2 | head -n 1)
     for j in $(seq 1 1 $num)
     do
         count=$(($count+1))
